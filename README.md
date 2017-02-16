@@ -1,4 +1,4 @@
-# set up development environment for parallel-NetCDF4-C project
+# Set up development environment for parallel-NetCDF4-C project
 
 This repo contains a Eclipse (Neon.2 Release 4.6.2) C project that holds some parallel-NetCDF4-C demo codes.
 
@@ -37,16 +37,39 @@ tar xvzf netcdf-4.4.1.1.tar.gz
 # use default zlib installed by zlib1g-dev
 CC=mpicc CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" ./configure --enable-shared --enable-parallel-tests --prefix=/usr/local
 make -j8
-make check (optional)
+make check (optional, see below)
 sudo make install
+nc-config --all
+
+# fix bug in parallel test cases: only apply to 4.4.1.1
+## Add missing #include "err_macros.h" to ./h5_test/tst_h_par.c
+## vi ./h5_test/tst_h_par.c
+#include <nc_tests.h>
+#include "err_macros.h"
+#include <hdf5.h>
+
 
 # make sys aware of libs newly installed
 sudo ldconfig
 
-# install Eclipse
-https://www.eclipse.org/downloads/download.php?file=/oomph/epp/neon/R2a/eclipse-inst-win64.exe
+# install Eclipse (Neon.2)
+https://www.eclipse.org/downloads/
 
 # notes:
 Debug mode dynamically links .so files; Release mode statically links .a files
 check executable dependency (check which zlib/libz.so linked): ldd executable_file_name
+
+#How to compile/link a source code in commnad line
+see http://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html#build_parallel
+# Release Compile
+mpicc -I/tmp/netcdf-4.4.1.1 -I/tmp/netcdf-4.4.1.1/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"tst_parallel3.d" -MT"tst_parallel3.o" -o tst_parallel3.o tst_parallel3.c
+# Dynamic link
+mpicc -o tst_parallel3 tst_parallel3.o -lnetcdf
+# Static link 
+(be use to link against the right "libz.a" used to build hdf5 
+# link to a specific libz (used to build hdf5) 
+mpicc -o tst_parallel3 tst_parallel3.o /usr/local/lib/libnetcdf.a  /usr/local/lib/libhdf5_hl.a /usr/local/lib/libhdf5.a /usr/local/lib/libsz.a /usr/local/lib/libz.a -ldl -lm
+# link to default/sys libz
+mpicc -o tst_parallel3 tst_parallel3.o /usr/local/lib/libnetcdf.a  /usr/local/lib/libhdf5_hl.a /usr/local/lib/libhdf5.a /usr/local/lib/libsz.a -ldl -lm -lz
+
 
