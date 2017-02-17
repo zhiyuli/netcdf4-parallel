@@ -12,6 +12,16 @@ which mpicc # /usr/bin/mpicc
 # install dependencies
 sudo apt-get install zlib1g-dev m4 build-essential
 
+# install mpe
+see: https://cs.calvin.edu/courses/cs/374/MPI/MPE/
+cd ~
+wget ftp://ftp.mcs.anl.gov/pub/mpi/mpe/mpe2-2.4.9b.tgz
+tar xvzf mpe2-2.4.9b.tgz
+cd mpe*
+./configure CC=/usr/bin/gcc MPI_CC=/usr/bin/mpicc --disable-f77 --prefix=/usr/local
+make -j8
+sudo make install
+
 # build szip
 cd ~
 wget https://support.hdfgroup.org/ftp/lib-external/szip/2.1.1/src/szip-2.1.1.tar.gz
@@ -62,14 +72,16 @@ check executable dependency (check which zlib/libz.so linked): ldd executable_fi
 #How to compile/link a source code in commnad line
 see http://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html#build_parallel
 # Release Compile
-mpicc -I/tmp/netcdf-4.4.1.1 -I/tmp/netcdf-4.4.1.1/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"tst_parallel3.d" -MT"tst_parallel3.o" -o tst_parallel3.o tst_parallel3.c
+mpicc -I/tmp/netcdf-4.4.1.1 -I/tmp/netcdf-4.4.1.1/include -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"tst_parallel4.d" -MT"tst_parallel4.o" -o tst_parallel4.o tst_parallel4.c
 # Dynamic link
-mpicc -o tst_parallel3 tst_parallel3.o -lnetcdf
+mpicc -o tst_parallel4 tst_parallel4.o -lnetcdf -lmpe -llmpe -pthread
+
+
 # Static link 
 (be use to link against the right "libz.a" used to build hdf5 
-# link to a specific libz (used to build hdf5) 
-mpicc -o tst_parallel3 tst_parallel3.o /usr/local/lib/libnetcdf.a  /usr/local/lib/libhdf5_hl.a /usr/local/lib/libhdf5.a /usr/local/lib/libsz.a /usr/local/lib/libz.a -ldl -lm
-# link to default/sys libz
-mpicc -o tst_parallel3 tst_parallel3.o /usr/local/lib/libnetcdf.a  /usr/local/lib/libhdf5_hl.a /usr/local/lib/libhdf5.a /usr/local/lib/libsz.a -ldl -lm -lz
+# Dynamically link to a specific libz (used to build hdf5) 
+mpicc -o tst_parallel4 tst_parallel4.o /usr/local/lib/libnetcdf.a  /usr/local/lib/libhdf5_hl.a /usr/local/lib/libhdf5.a /usr/local/lib/libsz.a /usr/local/lib/libz.a /usr/local/lib/libmpe.a /usr/local/lib/liblmpe.a -ldl -lm -pthread
+# Statically link to default/sys libz
+mpicc -o tst_parallel4 tst_parallel4.o /usr/local/lib/libnetcdf.a  /usr/local/lib/libhdf5_hl.a /usr/local/lib/libhdf5.a /usr/local/lib/libsz.a /usr/local/lib/libmpe.a /usr/local/lib/liblmpe.a -ldl -lm -lz -pthread
 
 
