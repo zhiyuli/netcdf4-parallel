@@ -10,7 +10,7 @@
  * must also relink with -llmpe -lmpe). This causes clog2 output to be
  * written, which can be converted to slog2 (by the program
  * clog2TOslog2) and then used in the analysis program jumpshot. */
-/*#define USE_MPE 1*/
+#define USE_MPE 1
 
 #include "nc_tests.h"
 #include "err_macros.h"
@@ -51,6 +51,7 @@ main(int argc, char **argv)
 
 #ifdef USE_MPE
     int s_init, e_init, s_define, e_define, s_write, e_write, s_close, e_close;
+    int s_open, e_open, s_read, e_read;
 #endif /* USE_MPE */
 
     /* Initialize MPI. */

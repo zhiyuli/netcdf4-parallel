@@ -29,7 +29,7 @@ all: netcdf4-parallel
 netcdf4-parallel: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	mpicc -o "netcdf4-parallel" $(OBJS) $(USER_OBJS) $(LIBS) -ldl -lm -lz
+	mpicc -o "netcdf4-parallel" $(OBJS) $(USER_OBJS) $(LIBS) -ldl -lm -lz -pthread
 	@echo 'Finished building target: $@'
 	@echo ' '
 
